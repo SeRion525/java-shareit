@@ -18,7 +18,7 @@ import static ru.practicum.shareit.user.UserServiceImpl.NOT_FOUND_USER;
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    public final static String NOT_FOUND_ITEM = "Не найдена вещь с ID = ";
+    public static final String NOT_FOUND_ITEM = "Не найдена вещь с ID = ";
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final ItemMapper itemMapper;

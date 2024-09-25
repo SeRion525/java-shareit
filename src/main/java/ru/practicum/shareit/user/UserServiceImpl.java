@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    public final static String NOT_FOUND_USER = "Не найден пользователь с ID = ";
+    public static final String NOT_FOUND_USER = "Не найден пользователь с ID = ";
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 

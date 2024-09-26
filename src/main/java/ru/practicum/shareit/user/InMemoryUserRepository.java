@@ -13,7 +13,7 @@ import java.util.Set;
 @Repository
 public class InMemoryUserRepository implements UserRepository {
     private final Map<Long, User> users = new HashMap<>();
-    private final Map<Long, String> usersAndEmails = new HashMap<>();
+    private final Set<String> emails = new HashSet<>();
     private long userCounter = 0;
 
     @Override
@@ -30,26 +30,28 @@ public class InMemoryUserRepository implements UserRepository {
     public User save(User user) {
         user.setId(generateId());
         users.put(user.getId(), user);
-        usersAndEmails.putIfAbsent(user.getId(), user.getEmail());
+        emails.add(user.getEmail());
         return user;
     }
 
     @Override
     public User update(User user) {
         users.put(user.getId(), user);
-        usersAndEmails.put(user.getId(), user.getEmail());
+        emails.add(user.getEmail());
         return user;
     }
 
     @Override
     public void delete(long userId) {
-        users.remove(userId);
-        usersAndEmails.remove(userId);
+        User user = users.remove(userId);
+        if (user != null) {
+            emails.remove(user.getEmail());
+        }
     }
 
     @Override
     public Set<String> getEmails() {
-        return new HashSet<>(usersAndEmails.values());
+        return new HashSet<>(emails);
     }
 
     private long generateId() {

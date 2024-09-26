@@ -17,7 +17,6 @@ import ru.practicum.shareit.item.dto.ItemCreateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

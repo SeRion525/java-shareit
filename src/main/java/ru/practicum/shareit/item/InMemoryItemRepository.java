@@ -38,11 +38,13 @@ public class InMemoryItemRepository implements ItemRepository {
     public Item save(Item item) {
         item.setId(generateId());
         items.putIfAbsent(item.getId(), item);
-        if (usersAndItems.containsKey(item.getOwnerId())) {
-            usersAndItems.computeIfPresent(item.getOwnerId(), (key, value) -> value).add(item.getId());
-        } else {
-            usersAndItems.computeIfAbsent(item.getOwnerId(), key -> new HashSet<>()).add(item.getId());
+
+        Set<Long> userItemsIds = usersAndItems.get(item.getOwnerId());
+        if (userItemsIds == null) {
+            userItemsIds = new HashSet<>();
         }
+        userItemsIds.add(item.getId());
+        usersAndItems.put(item.getOwnerId(), userItemsIds);
 
         return item;
     }

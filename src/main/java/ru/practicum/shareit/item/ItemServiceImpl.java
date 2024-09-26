@@ -11,6 +11,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static ru.practicum.shareit.user.UserServiceImpl.NOT_FOUND_USER;
@@ -67,6 +68,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItems(String text) {
+        if (text == null || text.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         return itemRepository.searchItems(text).stream()
                 .map(itemMapper::toItemDto)
                 .toList();

@@ -53,10 +53,6 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> searchItems(@RequestParam(name = "text") String text) {
-        if (text == null || text.isEmpty()) {
-            return new ArrayList<>();
-        }
-
         return itemService.searchItems(text);
     }
 }

@@ -13,7 +13,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     public static final String NOT_FOUND_USER = "Не найден пользователь с ID = ";
     private final UserRepository userRepository;

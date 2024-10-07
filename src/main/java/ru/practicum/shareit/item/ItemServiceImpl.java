@@ -3,11 +3,14 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemCreateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
@@ -19,21 +22,31 @@ import static ru.practicum.shareit.user.UserServiceImpl.NOT_FOUND_USER;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
     public static final String NOT_FOUND_ITEM = "Не найдена вещь с ID = ";
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
     private final ItemMapper itemMapper;
 
     @Override
-    public List<ItemDto> getItemsByUserId(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NotFoundException(NOT_FOUND_USER + userId);
+    @Transactional(readOnly = true)
+    public List<ItemWithBookingDto> getItemsByOwnerId(Long ownerId) {
+        if (!userRepository.existsById(ownerId)) {
+            throw new NotFoundException(NOT_FOUND_USER + ownerId);
         }
 
-        return itemRepository.findAllByOwnerId(userId).stream()
-                .map(itemMapper::toItemDto)
+        List<Item> items = itemRepository.findAllByOwnerId(ownerId);
+        if (items.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return items.stream()
+                .map(item -> {
+                    Booking last = bookingRepository.findLastByItemId(item.getId()).orElse(null);
+                    Booking next = bookingRepository.findNextByItemId(item.getId()).orElse(null);
+                    return itemMapper.toItemWithBookingDto(item, last, next);
+                })
                 .toList();
     }
 

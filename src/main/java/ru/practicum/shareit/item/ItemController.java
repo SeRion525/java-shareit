@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.ItemCreateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingDto;
 
 import java.util.List;
 
@@ -33,8 +34,8 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getItemsByUserId(@RequestHeader(X_SHARER_USER_ID) Long userId) {
-        return itemService.getItemsByUserId(userId);
+    public List<ItemWithBookingDto> getItemsByOwnerId(@RequestHeader(X_SHARER_USER_ID) Long ownerId) {
+        return itemService.getItemsByOwnerId(ownerId);
     }
 
     @PostMapping

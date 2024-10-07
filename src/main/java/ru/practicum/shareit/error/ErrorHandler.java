@@ -12,36 +12,44 @@ import ru.practicum.shareit.exception.DuplicatedDataException;
 import ru.practicum.shareit.exception.NotFoundException;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
+    private final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFound(final NotFoundException exception) {
-        log.warn(exception.getMessage(), exception);
-        return new ErrorResponse(HttpStatus.NOT_FOUND, "Не найдена сущность", exception.getMessage());
+        log.warn("400 {}", exception.getMessage(), exception);
+        exception.printStackTrace(new PrintStream(out));
+        return new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage(), out.toString(StandardCharsets.UTF_8));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleDuplicatedData(final DuplicatedDataException exception) {
-        log.warn(exception.getMessage(), exception);
-        return new ErrorResponse(HttpStatus.CONFLICT, "Дублирование данных", exception.getMessage());
+        log.warn("409 {}", exception.getMessage(), exception);
+        exception.printStackTrace(new PrintStream(out));
+        return new ErrorResponse(HttpStatus.CONFLICT, exception.getMessage(), out.toString(StandardCharsets.UTF_8));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleAccessDenied(final AccessDeniedException exception) {
-        log.warn(exception.getMessage(), exception);
-        return new ErrorResponse(HttpStatus.FORBIDDEN, "Доступ запрещён", exception.getMessage());
+        log.warn("403 {}", exception.getMessage(), exception);
+        exception.printStackTrace(new PrintStream(out));
+        return new ErrorResponse(HttpStatus.FORBIDDEN, exception.getMessage(), out.toString(StandardCharsets.UTF_8));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationErrorResponse handleConstraintValidationException(final ConstraintViolationException exception) {
-        log.warn(exception.getMessage(), exception);
+        log.warn("400 {}", exception.getMessage(), exception);
 
         final List<Violation> violations = exception.getConstraintViolations().stream()
                 .map(violation -> new Violation(violation.getPropertyPath().toString(), violation.getMessage()))
@@ -53,7 +61,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationErrorResponse handleMethodArgumentNotValid(final MethodArgumentNotValidException exception) {
-        log.warn(exception.getMessage(), exception);
+        log.warn("400 {}", exception.getMessage(), exception);
 
         final List<Violation> violations = exception.getBindingResult().getFieldErrors().stream()
                 .map(error -> new Violation(error.getField(), error.getDefaultMessage()))
@@ -65,7 +73,8 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleOther(final Throwable exception) {
-        log.warn(exception.getMessage(), exception);
-        return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Неизвестная ошибка", exception.getMessage());
+        log.warn("500 {}", exception.getMessage(), exception);
+        exception.printStackTrace(new PrintStream(out));
+        return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage(), out.toString(StandardCharsets.UTF_8));
     }
 }

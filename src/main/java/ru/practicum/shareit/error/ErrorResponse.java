@@ -1,13 +1,15 @@
 package ru.practicum.shareit.error;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
+@Setter
 public class ErrorResponse {
-    private final HttpStatus status;
-    private final String error;
-    private final String description;
+    private HttpStatus status;
+    private String description;
+    private String stackTrace;
 }

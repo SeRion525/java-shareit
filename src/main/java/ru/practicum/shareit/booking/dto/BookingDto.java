@@ -1,9 +1,15 @@
 package ru.practicum.shareit.booking.dto;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.shareit.user.dto.UserShortDto;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class BookingDto {
     private Long id;
     private ItemShortDto item;
@@ -12,7 +18,10 @@ public class BookingDto {
     private String start;
     private String end;
 
-    @Data
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class ItemShortDto {
         private Long id;
         private String name;

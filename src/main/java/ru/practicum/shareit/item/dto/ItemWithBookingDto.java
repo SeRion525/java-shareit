@@ -1,8 +1,14 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ItemWithBookingDto {
     private Long id;
     private String name;
@@ -11,7 +17,10 @@ public class ItemWithBookingDto {
     private BookingDto lastBooking;
     private BookingDto nextBooking;
 
-    @Data
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class BookingDto {
         private Long id;
         private Long bookerId;

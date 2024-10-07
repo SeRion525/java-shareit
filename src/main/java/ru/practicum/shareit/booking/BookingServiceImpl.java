@@ -95,8 +95,10 @@ public class BookingServiceImpl implements BookingService {
             case CURRENT -> bookingRepository.findCurrentByBookerId(bookerId);
             case PAST -> bookingRepository.findPastByBookerId(bookerId);
             case FUTURE -> bookingRepository.findFutureByBookerId(bookerId);
-            case WAITING -> bookingRepository.findAllByBookerIdAndStatusOrderByStartDateDesc(bookerId, BookingStatus.WAITING);
-            case REJECTED -> bookingRepository.findAllByBookerIdAndStatusOrderByStartDateDesc(bookerId, BookingStatus.REJECTED);
+            case WAITING ->
+                    bookingRepository.findAllByBookerIdAndStatusOrderByStartDateDesc(bookerId, BookingStatus.WAITING);
+            case REJECTED ->
+                    bookingRepository.findAllByBookerIdAndStatusOrderByStartDateDesc(bookerId, BookingStatus.REJECTED);
         };
 
         return bookings.stream()

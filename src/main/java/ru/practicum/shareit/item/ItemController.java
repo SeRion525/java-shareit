@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.item.dto.ItemCreateDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
-import ru.practicum.shareit.item.dto.ItemWithBookingDto;
 
 import java.util.List;
 
@@ -25,23 +26,29 @@ import static ru.practicum.shareit.util.Headers.X_SHARER_USER_ID;
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
+@Slf4j
 public class ItemController {
     private final ItemService itemService;
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@PathVariable Long itemId) {
+    public ItemInfoDto getItem(@PathVariable Long itemId) {
+        log.info("Get item with id {}", itemId);
         return itemService.getItem(itemId);
     }
 
     @GetMapping
-    public List<ItemWithBookingDto> getItemsByOwnerId(@RequestHeader(X_SHARER_USER_ID) Long ownerId) {
+    public List<ItemInfoDto> getItemsByOwnerId(@RequestHeader(X_SHARER_USER_ID) Long ownerId) {
+        log.info("Get items by owner id {}", ownerId);
         return itemService.getItemsByOwnerId(ownerId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ItemDto addNewItem(@RequestHeader(X_SHARER_USER_ID) Long ownerId, @RequestBody @Valid ItemCreateDto itemDto) {
-        return itemService.addNewItem(ownerId, itemDto);
+        log.info("Add new item {}", itemDto);
+        ItemDto item = itemService.addNewItem(ownerId, itemDto);
+        log.info("Added new item {}", item);
+        return item;
     }
 
     @PatchMapping("/{itemId}")
@@ -50,11 +57,15 @@ public class ItemController {
                               @RequestBody @Valid ItemUpdateDto itemDto) {
 
         itemDto.setId(itemId);
-        return itemService.updateItem(ownerId, itemDto);
+        log.info("Update item {}", itemDto);
+        ItemDto item = itemService.updateItem(ownerId, itemDto);
+        log.info("Updated item {}", item);
+        return item;
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchItems(@RequestParam(name = "text") String text) {
+        log.info("Search items with text {}", text);
         return itemService.searchItems(text);
     }
 }

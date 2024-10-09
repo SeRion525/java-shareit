@@ -1,7 +1,7 @@
 services:
   server:
     build: .
-    image: shareit-server
+    image: shareit-server:2
     container_name: shareit-server
     ports:
       - "8080:8080"

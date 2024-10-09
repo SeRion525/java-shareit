@@ -12,9 +12,6 @@ import ru.practicum.shareit.exception.DuplicatedDataException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -25,36 +22,28 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFound(final NotFoundException exception) {
         log.warn("400 {}", exception.getMessage(), exception);
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        exception.printStackTrace(new PrintStream(out));
-        return new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage(), out.toString(StandardCharsets.UTF_8));
+        return new ErrorResponse(HttpStatus.NOT_FOUND, exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleDuplicatedData(final DuplicatedDataException exception) {
         log.warn("409 {}", exception.getMessage(), exception);
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        exception.printStackTrace(new PrintStream(out));
-        return new ErrorResponse(HttpStatus.CONFLICT, exception.getMessage(), out.toString(StandardCharsets.UTF_8));
+        return new ErrorResponse(HttpStatus.CONFLICT, exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorResponse handleAccessDenied(final AccessDeniedException exception) {
         log.warn("403 {}", exception.getMessage(), exception);
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        exception.printStackTrace(new PrintStream(out));
-        return new ErrorResponse(HttpStatus.FORBIDDEN, exception.getMessage(), out.toString(StandardCharsets.UTF_8));
+        return new ErrorResponse(HttpStatus.FORBIDDEN, exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final ValidationException exception) {
         log.warn("400 {}", exception.getMessage(), exception);
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        exception.printStackTrace(new PrintStream(out));
-        return new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage(), out.toString(StandardCharsets.UTF_8));
+        return new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
     @ExceptionHandler
@@ -85,8 +74,6 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleOther(final Throwable exception) {
         log.warn("500 {}", exception.getMessage(), exception);
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        exception.printStackTrace(new PrintStream(out));
-        return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage(), out.toString(StandardCharsets.UTF_8));
+        return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
     }
 }

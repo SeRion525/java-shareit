@@ -8,10 +8,6 @@ logging.level:
 
 spring:
   profiles.active: prod
-
----
-spring:
-  config.activate.on-profile: prod
   jpa:
     hibernate.ddl-auto: none
     properties.hibernate.format_sql: true
@@ -19,6 +15,10 @@ spring:
     init:
       mode: ALWAYS
       schema-locations: classpath:schema.sql
+
+---
+spring:
+  config.activate.on-profile: prod
   datasource:
     url: jdbc:postgresql://localhost:6432/shareit
     driverClassName: org.postgresql.Driver
@@ -29,13 +29,7 @@ spring:
 spring:
   config.activate.on-profile: test
   jpa:
-    hibernate.ddl-auto: none
-    properties.hibernate.format_sql: true
     show-sql: true
-  sql:
-    init:
-      mode: ALWAYS
-      schema-locations: classpath:schema.sql
   datasource:
     url: jdbc:h2:file:./db/shareit
     driverClassName: org.h2.Driver

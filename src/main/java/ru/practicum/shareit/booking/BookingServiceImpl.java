@@ -16,6 +16,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static ru.practicum.shareit.item.ItemServiceImpl.NOT_FOUND_ITEM;
@@ -39,7 +40,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_ITEM + bookingCreateDto.getItemId()));
 
         if (!item.getAvailable()) {
-            throw new ValidationException("Вещь с ID = " + bookingCreateDto.getItemId() + " не доступна к бронированию");
+            throw new ValidationException("Вещь с ID = " + bookingCreateDto.getItemId() + " недоступна к бронированию");
         }
 
         Booking booking = bookingMapper.toBooking(bookingCreateDto);
@@ -92,9 +93,9 @@ public class BookingServiceImpl implements BookingService {
 
         List<Booking> bookings = switch (state) {
             case ALL -> bookingRepository.findAllByBookerIdOrderByStartDateDesc(bookerId);
-            case CURRENT -> bookingRepository.findCurrentByBookerId(bookerId);
-            case PAST -> bookingRepository.findPastByBookerId(bookerId);
-            case FUTURE -> bookingRepository.findFutureByBookerId(bookerId);
+            case CURRENT -> bookingRepository.findCurrentByBookerId(bookerId, LocalDateTime.now());
+            case PAST -> bookingRepository.findPastByBookerId(bookerId, LocalDateTime.now());
+            case FUTURE -> bookingRepository.findFutureByBookerId(bookerId, LocalDateTime.now());
             case WAITING ->
                     bookingRepository.findAllByBookerIdAndStatusOrderByStartDateDesc(bookerId, BookingStatus.WAITING);
             case REJECTED ->
@@ -112,9 +113,9 @@ public class BookingServiceImpl implements BookingService {
 
         List<Booking> bookings = switch (state) {
             case ALL -> bookingRepository.findAllByOwnerId(ownerId);
-            case CURRENT -> bookingRepository.findCurrentByOwnerId(ownerId);
-            case PAST -> bookingRepository.findPastByOwnerId(ownerId);
-            case FUTURE -> bookingRepository.findFutureByOwnerId(ownerId);
+            case CURRENT -> bookingRepository.findCurrentByOwnerId(ownerId, LocalDateTime.now());
+            case PAST -> bookingRepository.findPastByOwnerId(ownerId, LocalDateTime.now());
+            case FUTURE -> bookingRepository.findFutureByOwnerId(ownerId, LocalDateTime.now());
             case WAITING -> bookingRepository.findAllByOwnerIdAndStatus(ownerId, BookingStatus.WAITING);
             case REJECTED -> bookingRepository.findAllByOwnerIdAndStatus(ownerId, BookingStatus.REJECTED);
         };

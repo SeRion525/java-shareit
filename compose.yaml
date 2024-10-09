@@ -1,0 +1,25 @@
+services:
+  server:
+    build: .
+    image: shareit-server:2
+    container_name: shareit-server
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
+      - SPRING_DATASOURCE_USERNAME=shareit
+      - SPRING_DATASOURCE_PASSWORD=shareit
+      - TZ=Europe/Moscow
+
+  db:
+    image: postgres:16-alpine
+    container_name: shareit-db
+    ports:
+      - "6432:5432"
+    environment:
+      - POSTGRES_DB=shareit
+      - POSTGRES_USER=shareit
+      - POSTGRES_PASSWORD=shareit
+      - TZ=Europe/Moscow

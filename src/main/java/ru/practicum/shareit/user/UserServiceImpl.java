@@ -2,6 +2,7 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.DuplicatedDataException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserCreateDto;
@@ -19,19 +20,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAllUsers() {
-        return userRepository.getAll().stream()
+        return userRepository.findAll().stream()
                 .map(userMapper::toUserDto)
                 .toList();
     }
 
     @Override
     public UserDto getUserById(Long userId) {
-        return userRepository.getById(userId)
+        return userRepository.findById(userId)
                 .map(userMapper::toUserDto)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_USER + userId));
     }
 
     @Override
+    @Transactional
     public UserDto saveUser(UserCreateDto userDto) {
         if (isUsedEmail(userDto.getEmail())) {
             throw new DuplicatedDataException("Данный email уже используется");
@@ -43,24 +45,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto updateUser(UserUpdateDto userDto) {
-        User updatedUser = userRepository.getById(userDto.getId())
+        User updatedUser = userRepository.findById(userDto.getId())
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_USER + userDto.getId()));
 
         if (userDto.getEmail() != null && isUsedEmail(userDto.getEmail())) {
             throw new DuplicatedDataException("Данный email уже используется");
         }
 
-        updatedUser = userRepository.update(userMapper.updateUserFields(updatedUser, userDto));
+        updatedUser = userRepository.save(userMapper.updateUserFields(updatedUser, userDto));
         return userMapper.toUserDto(updatedUser);
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long userId) {
-        userRepository.delete(userId);
+        userRepository.deleteById(userId);
     }
 
     private boolean isUsedEmail(String email) {
-        return userRepository.getEmails().contains(email);
+        return userRepository.existsUserByEmail(email);
     }
 }

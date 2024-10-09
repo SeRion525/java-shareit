@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.practicum.shareit.item.comment.dto.CommentShortDto;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,6 +17,7 @@ public class ItemInfoDto {
     private String name;
     private String description;
     private Boolean available;
+    private List<CommentShortDto> comments;
     private BookingDto lastBooking;
     private BookingDto nextBooking;
 

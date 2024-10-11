@@ -5,13 +5,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.handler.AllBookingRequestHandler;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.booking.handler.AllBookingRequestHandler;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
@@ -91,18 +91,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getBookingsByBooker(Long bookerId, BookingState state) {
         checkUserInRepository(bookerId);
-
-        /*List<Booking> bookings = switch (state) {
-            case ALL -> bookingRepository.findAllByBookerIdOrderByStartDateDesc(bookerId);
-            case CURRENT -> bookingRepository.findCurrentByBookerId(bookerId, LocalDateTime.now());
-            case PAST -> bookingRepository.findPastByBookerId(bookerId, LocalDateTime.now());
-            case FUTURE -> bookingRepository.findFutureByBookerId(bookerId, LocalDateTime.now());
-            case WAITING ->
-                    bookingRepository.findAllByBookerIdAndStatusOrderByStartDateDesc(bookerId, BookingStatus.WAITING);
-            case REJECTED ->
-                    bookingRepository.findAllByBookerIdAndStatusOrderByStartDateDesc(bookerId, BookingStatus.REJECTED);
-        };*/
-
         return bookingRequestHandler.manageRequest(bookerId, state, false)
                 .stream()
                 .map(bookingMapper::toBookingDto)
@@ -112,16 +100,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getBookingsByOwner(Long ownerId, BookingState state) {
         checkUserInRepository(ownerId);
-
-        /*List<Booking> bookings = switch (state) {
-            case ALL -> bookingRepository.findAllByOwnerId(ownerId);
-            case CURRENT -> bookingRepository.findCurrentByOwnerId(ownerId, LocalDateTime.now());
-            case PAST -> bookingRepository.findPastByOwnerId(ownerId, LocalDateTime.now());
-            case FUTURE -> bookingRepository.findFutureByOwnerId(ownerId, LocalDateTime.now());
-            case WAITING -> bookingRepository.findAllByOwnerIdAndStatus(ownerId, BookingStatus.WAITING);
-            case REJECTED -> bookingRepository.findAllByOwnerIdAndStatus(ownerId, BookingStatus.REJECTED);
-        };*/
-
         return bookingRequestHandler.manageRequest(ownerId, state, true)
                 .stream()
                 .map(bookingMapper::toBookingDto)

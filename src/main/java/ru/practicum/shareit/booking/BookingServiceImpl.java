@@ -11,12 +11,12 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.booking.handler.AllBookingRequestHandler;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static ru.practicum.shareit.item.ItemServiceImpl.NOT_FOUND_ITEM;
@@ -30,6 +30,7 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingMapper bookingMapper;
+    private final AllBookingRequestHandler bookingRequestHandler;
 
     @Override
     @Transactional
@@ -91,7 +92,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDto> getBookingsByBooker(Long bookerId, BookingState state) {
         checkUserInRepository(bookerId);
 
-        List<Booking> bookings = switch (state) {
+        /*List<Booking> bookings = switch (state) {
             case ALL -> bookingRepository.findAllByBookerIdOrderByStartDateDesc(bookerId);
             case CURRENT -> bookingRepository.findCurrentByBookerId(bookerId, LocalDateTime.now());
             case PAST -> bookingRepository.findPastByBookerId(bookerId, LocalDateTime.now());
@@ -100,9 +101,10 @@ public class BookingServiceImpl implements BookingService {
                     bookingRepository.findAllByBookerIdAndStatusOrderByStartDateDesc(bookerId, BookingStatus.WAITING);
             case REJECTED ->
                     bookingRepository.findAllByBookerIdAndStatusOrderByStartDateDesc(bookerId, BookingStatus.REJECTED);
-        };
+        };*/
 
-        return bookings.stream()
+        return bookingRequestHandler.manageRequest(bookerId, state, false)
+                .stream()
                 .map(bookingMapper::toBookingDto)
                 .toList();
     }
@@ -111,16 +113,17 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDto> getBookingsByOwner(Long ownerId, BookingState state) {
         checkUserInRepository(ownerId);
 
-        List<Booking> bookings = switch (state) {
+        /*List<Booking> bookings = switch (state) {
             case ALL -> bookingRepository.findAllByOwnerId(ownerId);
             case CURRENT -> bookingRepository.findCurrentByOwnerId(ownerId, LocalDateTime.now());
             case PAST -> bookingRepository.findPastByOwnerId(ownerId, LocalDateTime.now());
             case FUTURE -> bookingRepository.findFutureByOwnerId(ownerId, LocalDateTime.now());
             case WAITING -> bookingRepository.findAllByOwnerIdAndStatus(ownerId, BookingStatus.WAITING);
             case REJECTED -> bookingRepository.findAllByOwnerIdAndStatus(ownerId, BookingStatus.REJECTED);
-        };
+        };*/
 
-        return bookings.stream()
+        return bookingRequestHandler.manageRequest(ownerId, state, true)
+                .stream()
                 .map(bookingMapper::toBookingDto)
                 .toList();
     }

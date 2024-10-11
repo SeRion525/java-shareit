@@ -14,11 +14,13 @@ spring:
   sql:
     init:
       mode: ALWAYS
-      schema-locations: classpath:schema.sql
 
 ---
 spring:
   config.activate.on-profile: prod
+  sql:
+    init:
+      schema-locations: classpath:schema.sql
   datasource:
     url: jdbc:postgresql://localhost:6432/shareit
     driverClassName: org.postgresql.Driver
@@ -27,7 +29,10 @@ spring:
 
 ---
 spring:
-  config.activate.on-profile: test
+  config.activate.on-profile: dev
+  sql:
+    init:
+      schema-locations: classpath:schema_dev.sql
   jpa:
     show-sql: true
   datasource:

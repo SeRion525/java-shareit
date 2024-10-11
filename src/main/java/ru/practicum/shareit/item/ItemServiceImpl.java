@@ -124,6 +124,7 @@ public class ItemServiceImpl implements ItemService {
             return new ArrayList<>();
         }
 
+        text = text.toLowerCase();
         return itemRepository.findItemsByText(text).stream()
                 .map(itemMapper::toItemDto)
                 .toList();

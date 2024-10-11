@@ -32,6 +32,3 @@ CREATE TABLE IF NOT EXISTS comments
     author_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
-
-CREATE INDEX IF NOT EXISTS search_item_by_name_and_desc_index
-ON items(lower(name), lower(description));

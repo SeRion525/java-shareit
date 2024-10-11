@@ -7,7 +7,6 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByBookerIdOrderByStartDateDesc(long bookerId);
@@ -56,14 +55,27 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(value = """
             select BOOKINGS.* from BOOKINGS
-            left join (select ITEM_ID, max(END_DATE) as max_end_date from BOOKINGS
-                  where ITEM_ID in (?1) and STATUS = 'APPROVED' and ?2 >= END_DATE
-                  group by ITEM_ID) as last on BOOKINGS.ITEM_ID = last.ITEM_ID
-            left join (select ITEM_ID, min(START_DATE) as min_start_date from BOOKINGS
-                  where ITEM_ID in (?1) and STATUS = 'APPROVED' and ?2 <= START_DATE
-                  group by ITEM_ID) as next on BOOKINGS.ITEM_ID = next.ITEM_ID
-            where END_DATE = last.max_end_date or START_DATE = next.min_start_date;""", nativeQuery = true)
-    List<Booking> findLastAndNextByItemIds(List<Long> itemIds, LocalDateTime current);
+                     left join (select ITEM_ID, max(END_DATE) as max_end_date 
+                                from BOOKINGS
+                                where ITEM_ID in (?1) 
+                                  and STATUS = 'APPROVED' 
+                                  and ?2 >= END_DATE
+                                group by ITEM_ID) as last on BOOKINGS.ITEM_ID = last.ITEM_ID
+            where END_DATE = last.max_end_date;""",
+            nativeQuery = true)
+    List<Booking> findLastByItemIds(List<Long> itemIds, LocalDateTime current);
+
+    @Query(value = """
+            select BOOKINGS.* from BOOKINGS
+                     left join (select ITEM_ID, min(START_DATE) as min_start_date
+                                from BOOKINGS
+                                where ITEM_ID in (?1)
+                                  and STATUS = 'APPROVED'
+                                  and ?2 <= START_DATE
+                                group by ITEM_ID) as next on BOOKINGS.ITEM_ID = next.ITEM_ID
+            where START_DATE = next.min_start_date;""",
+            nativeQuery = true)
+    List<Booking> findNextByItemIds(List<Long> itemIds, LocalDateTime current);
 
     @Query("select case when count(*) > 0 then true else false end " +
             "from Booking b " +

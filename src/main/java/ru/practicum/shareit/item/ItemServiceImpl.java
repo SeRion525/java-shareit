@@ -23,7 +23,7 @@ import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -54,39 +54,28 @@ public class ItemServiceImpl implements ItemService {
         }
 
         List<Long> itemIds = items.stream().map(Item::getId).toList();
-        List<Booking> lastAndNextBookings = bookingRepository.findLastAndNextByItemIds(itemIds, LocalDateTime.now());
+        LocalDateTime current = LocalDateTime.now();
+
+        List<Booking> lastBookings = bookingRepository.findLastByItemIds(itemIds, current);
+        List<Booking> nextBookings = bookingRepository.findNextByItemIds(itemIds, current);
         List<Comment> allComments = commentRepository.findAllByItemIdIn(itemIds);
 
-        Map<Long, List<Booking>> bookingsByItemId;
-        if (!lastAndNextBookings.isEmpty()) {
-            bookingsByItemId = lastAndNextBookings.stream()
-                    .collect(Collectors.groupingBy(b -> b.getItem().getId(), Collectors.toList()));
-        } else {
-            bookingsByItemId = null;
-        }
+        Map<Long, Booking> lastBookingsByItemId = listToMapByItemId(lastBookings);
+        Map<Long, Booking> nextBookingsByItemId = listToMapByItemId(nextBookings);
 
         Map<Long, List<Comment>> commentsByItemId;
-        if (!allComments.isEmpty()) {
+        if (allComments != null && !allComments.isEmpty()) {
             commentsByItemId = allComments.stream()
                     .collect(Collectors.groupingBy(c -> c.getItem().getId(), Collectors.toList()));
         } else {
-            commentsByItemId = null;
+            commentsByItemId = new HashMap<>();
         }
 
         return items.stream()
                 .map(item -> {
-                    Booking last = null;
-                    Booking next = null;
-                    List<Comment> comments = null;
-                    if (bookingsByItemId != null) {
-                        last = bookingsByItemId.get(item.getId()).stream().min(Comparator.comparing(Booking::getEndDate)).orElse(null);
-                        next = bookingsByItemId.get(item.getId()).stream().max(Comparator.comparing(Booking::getEndDate)).orElse(null);
-                    }
-
-                    if (commentsByItemId != null) {
-                        comments = commentsByItemId.get(item.getId());
-                    }
-
+                    Booking last = lastBookingsByItemId.get(item.getId());
+                    Booking next = nextBookingsByItemId.get(item.getId());
+                    List<Comment> comments = commentsByItemId.get(item.getId());
                     return itemMapper.toItemInfoDto(item, last, next, comments);
                 })
                 .toList();
@@ -158,5 +147,15 @@ public class ItemServiceImpl implements ItemService {
         comment.setItem(item);
         comment = commentRepository.save(comment);
         return commentMapper.toCommentDto(comment);
+    }
+
+    private Map<Long, Booking> listToMapByItemId(List<Booking> bookings) {
+        if (bookings == null || bookings.isEmpty()) {
+            return new HashMap<>();
+        }
+
+        Map<Long, Booking> bookingsByItemId = new HashMap<>();
+        bookings.forEach(b -> bookingsByItemId.put(b.getItem().getId(), b));
+        return bookingsByItemId;
     }
 }

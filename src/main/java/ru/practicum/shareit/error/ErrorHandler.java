@@ -48,6 +48,13 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleIllegalArgument(final IllegalArgumentException exception) {
+        log.warn("400 {}", exception.getMessage(), exception);
+        return new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationErrorResponse handleConstraintValidationException(final ConstraintViolationException exception) {
         log.warn("400 {}", exception.getMessage(), exception);
 

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,15 +64,21 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getBookingsByBooker(@RequestHeader(X_SHARER_USER_ID) Long bookerId,
-                                                @RequestParam(name = "state", defaultValue = "ALL") String state) {
+                                                @RequestParam(name = "state", defaultValue = "ALL") @NotBlank String state) {
         log.info("Get bookings by booker {}, state {}", bookerId, state);
-        return bookingService.getBookingsByBooker(bookerId, BookingState.of(state));
+
+        BookingState bookingState = BookingState.from(state);
+        if (bookingState == null) {
+            throw new IllegalArgumentException("Неизвестное состояние бронирования: " + state);
+        }
+
+        return bookingService.getBookingsByBooker(bookerId, bookingState);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getBookingsByOwner(@RequestHeader(X_SHARER_USER_ID) Long ownerId,
                                                @RequestParam(name = "state", defaultValue = "ALL") String state) {
         log.info("Get bookings by owner {}, state {}", ownerId, state);
-        return bookingService.getBookingsByOwner(ownerId, BookingState.of(state));
+        return bookingService.getBookingsByOwner(ownerId, BookingState.from(state));
     }
 }

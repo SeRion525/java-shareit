@@ -1,21 +1,16 @@
 package ru.practicum.shareit.booking.model;
 
-import ru.practicum.shareit.exception.ValidationException;
-
 public enum BookingState {
     ALL, CURRENT, PAST, FUTURE, WAITING, REJECTED;
 
-    public static BookingState of(String state) {
+    public static BookingState from(String state) {
         state = state.toUpperCase();
 
-        return switch (state) {
-            case "ALL" -> ALL;
-            case "CURRENT" -> CURRENT;
-            case "PAST" -> PAST;
-            case "FUTURE" -> FUTURE;
-            case "WAITING" -> WAITING;
-            case "REJECTED" -> REJECTED;
-            default -> throw new ValidationException("Неккоректное состояние бронирования: " + state);
-        };
+        for (BookingState value : BookingState.values()) {
+            if (value.name().equals(state)) {
+                return value;
+            }
+        }
+        return null;
     }
 }

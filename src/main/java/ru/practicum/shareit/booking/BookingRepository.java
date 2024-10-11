@@ -55,10 +55,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(value = """
             select BOOKINGS.* from BOOKINGS
-                     left join (select ITEM_ID, max(END_DATE) as max_end_date 
+                     left join (select ITEM_ID, max(END_DATE) as max_end_date
                                 from BOOKINGS
-                                where ITEM_ID in (?1) 
-                                  and STATUS = 'APPROVED' 
+                                where ITEM_ID in (?1)
+                                  and STATUS = 'APPROVED'
                                   and ?2 >= END_DATE
                                 group by ITEM_ID) as last on BOOKINGS.ITEM_ID = last.ITEM_ID
             where END_DATE = last.max_end_date;""",

@@ -1,0 +1,22 @@
+logging.level:
+  org.springframework:
+    orm:
+      jpa: INFO
+      jpa.JpaTransactionManager: DEBUG
+    transaction: INFO
+    transaction.interceptor: TRACE
+
+spring:
+  sql:
+    init:
+      mode: ALWAYS
+      schema-locations: classpath:schema_dev.sql
+  jpa:
+    hibernate.ddl-auto: none
+    properties.hibernate.format_sql: true
+    show-sql: true
+  datasource:
+    url: jdbc:h2:file:./db/shareit
+    driverClassName: org.h2.Driver
+    username: shareit
+    password: shareit
